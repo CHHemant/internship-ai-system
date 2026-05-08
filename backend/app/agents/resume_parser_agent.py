@@ -36,9 +36,10 @@ class ResumeParserAgent:
         return content.decode("utf-8", errors="ignore")
 
     def parse(self, content: bytes, filename: str) -> ResumeProfile:
-        text = normalize_whitespace(self.extract_text(content, filename))
+        extracted_text = self.extract_text(content, filename)
+        text = normalize_whitespace(extracted_text)
         lower_text = text.lower()
-        lines = split_bullets(text)
+        lines = split_bullets(extracted_text)
 
         email = EMAIL_RE.search(text)
         skills = sorted({hint for hint in SKILL_HINTS if hint in lower_text})

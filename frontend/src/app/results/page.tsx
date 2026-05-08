@@ -5,11 +5,17 @@ import { useState } from "react";
 import { Nav } from "@/components/nav";
 import api from "@/lib/api";
 
+type GenerationResult = {
+  resume: string;
+  cover_letter: string;
+  verification: Record<string, unknown>;
+};
+
 export default function ResultsPage() {
   const [candidateId, setCandidateId] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [country, setCountry] = useState("global");
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<GenerationResult | null>(null);
 
   async function runWorkflow() {
     const response = await api.post("/api/applications/run", {
