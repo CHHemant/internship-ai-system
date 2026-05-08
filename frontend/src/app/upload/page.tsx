@@ -7,20 +7,29 @@ import api from "@/lib/api";
 
 export default function UploadPage() {
   const [status, setStatus] = useState<string>("");
+  const [error, setError] = useState<string>("");
 
   async function handleUpload(formData: FormData) {
     const file = formData.get("resume") as File | null;
     if (!file) {
+      setError("");
       setStatus("Please select a resume file.");
       return;
     }
 
-    const payload = new FormData();
-    payload.append("file", file);
-    const response = await api.post("/api/resume/upload", payload, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    setStatus(`Uploaded candidate #${response.data.candidate_id}`);
+    try {
+      const payload = new FormData();
+      payload.append("file", file);
+      const response = await api.post("/api/resume/upload", payload, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setError("");
+      setStatus(`Uploaded candidate #${response.data.candidate_id}`);
+    } catch (uploadError) {
+      console.error(uploadError);
+      setStatus("");
+      setError("Upload failed. Please verify the backend is running and try again.");
+    }
   }
 
   return (
@@ -35,6 +44,7 @@ export default function UploadPage() {
           </button>
         </form>
         {status && <p className="mt-4 text-cyan-300">{status}</p>}
+        {error && <p className="mt-4 text-rose-300">{error}</p>}
       </div>
     </main>
   );

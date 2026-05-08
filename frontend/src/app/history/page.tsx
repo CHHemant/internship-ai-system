@@ -15,9 +15,20 @@ type HistoryItem = {
 
 export default function HistoryPage() {
   const [items, setItems] = useState<HistoryItem[]>([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    api.get("/api/applications/history").then((response) => setItems(response.data));
+    api
+      .get("/api/applications/history")
+      .then((response) => {
+        setError("");
+        setItems(response.data);
+      })
+      .catch((requestError) => {
+        console.error(requestError);
+        setItems([]);
+        setError("Unable to load history. Verify backend connectivity and retry.");
+      });
   }, []);
 
   return (
@@ -25,6 +36,7 @@ export default function HistoryPage() {
       <div className="mx-auto max-w-5xl py-10">
         <Nav />
         <h1 className="mb-4 text-3xl font-semibold">Application History</h1>
+        {error && <p className="mb-4 text-rose-300">{error}</p>}
         <div className="overflow-hidden rounded-2xl border border-white/20">
           <table className="w-full text-left text-sm">
             <thead className="bg-white/10">

@@ -16,14 +16,22 @@ export default function ResultsPage() {
   const [jobDescription, setJobDescription] = useState("");
   const [country, setCountry] = useState("global");
   const [result, setResult] = useState<GenerationResult | null>(null);
+  const [error, setError] = useState("");
 
   async function runWorkflow() {
-    const response = await api.post("/api/applications/run", {
-      candidate_id: Number(candidateId),
-      job_description: jobDescription,
-      country,
-    });
-    setResult(response.data);
+    try {
+      const response = await api.post("/api/applications/run", {
+        candidate_id: Number(candidateId),
+        job_description: jobDescription,
+        country,
+      });
+      setError("");
+      setResult(response.data);
+    } catch (requestError) {
+      console.error(requestError);
+      setResult(null);
+      setError("Generation failed. Check your input and backend availability, then retry.");
+    }
   }
 
   return (
@@ -54,6 +62,7 @@ export default function ResultsPage() {
             Generate Application
           </button>
         </div>
+        {error && <p className="mb-4 text-rose-300">{error}</p>}
 
         {result && (
           <div className="grid gap-4 lg:grid-cols-2">
