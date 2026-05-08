@@ -85,7 +85,10 @@ def run_application(request: GenerateArtifactsRequest, db: Session = Depends(get
     state = workflow_router.run(profile, parsed_job, request.country)
     verification = state["verification"]
     if verification is None:
-        raise HTTPException(status_code=500, detail="Verification failed")
+        raise HTTPException(
+            status_code=500,
+            detail="Verification result was not produced by the workflow. Retry the request or check router/agent logs.",
+        )
 
     app_record = Application(
         candidate_id=request.candidate_id,
